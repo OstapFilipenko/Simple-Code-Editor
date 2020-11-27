@@ -7,6 +7,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.util.Scanner;
 
 public class Editor {
     private TextArea textArea = new TextArea();
@@ -16,6 +17,7 @@ public class Editor {
     }
 
     public Scene mainScene(){
+        FileChooser fileChooser = new FileChooser();
         VBox root = new VBox();
 
         //disable scroll in x axis
@@ -31,8 +33,6 @@ public class Editor {
         //MenuItem newFile = new MenuItem("New");
 
         save.setOnAction(event -> {
-            FileChooser fileChooser = new FileChooser();
-
             //Set extension filter for text files
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
             fileChooser.getExtensionFilters().add(extFilter);
@@ -42,6 +42,20 @@ public class Editor {
 
             if (file != null) {
                 saveTextToFile(textArea.getText(), file);
+            }
+        });
+
+        open.setOnAction(event -> {
+            //open File that user has choosen
+            File selectedFile = fileChooser.showOpenDialog(stage);
+            //adding the content of the file to the textArea
+            try {
+                String contents = new Scanner(selectedFile).useDelimiter("\\Z").next();
+                textArea.clear();
+                textArea.setText(contents);
+                stage.setTitle(selectedFile.getName());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
         });
 
