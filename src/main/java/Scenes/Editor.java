@@ -1,25 +1,19 @@
 package Scenes;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import javax.swing.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
 
 public class Editor {
-    public TextArea textArea = new TextArea();
+    private TextArea textArea = new TextArea();
+    private Stage stage;
+    public Editor(Stage stage){
+        this.stage = stage;
+    }
 
     public Scene mainScene(){
         VBox root = new VBox();
@@ -29,34 +23,44 @@ public class Editor {
 
         //createting menu
         MenuBar menuBar = new MenuBar();
-        Menu file = new Menu("File");
+        Menu fileMenu = new Menu("File");
         MenuItem open = new MenuItem("Open File");
         MenuItem save = new MenuItem("Save");
-        file.getItems().addAll(open, save);
-        menuBar.getMenus().addAll(file);
+        fileMenu.getItems().addAll(open, save);
+        menuBar.getMenus().addAll(fileMenu);
         //MenuItem newFile = new MenuItem("New");
-        save.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent t) {
-                saveFile();
+
+        save.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+
+            //Set extension filter for text files
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+            fileChooser.getExtensionFilters().add(extFilter);
+
+            //Show save file dialog
+            File file = fileChooser.showSaveDialog(stage);
+
+            if (file != null) {
+                saveTextToFile(textArea.getText(), file);
             }
         });
 
         root.getChildren().addAll(menuBar, textArea);
-        return new Scene(root, 300, 275);
+        return new Scene(root);
     }
 
-
-    public void saveFile() {
-        String sb = textArea.getText();
-        JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Save File");
-        int retrival = chooser.showSaveDialog(null);
-        if (retrival == JFileChooser.APPROVE_OPTION) {
-            try(FileWriter fw = new FileWriter(chooser.getSelectedFile()+".txt")) {
-                fw.write(sb);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+    /*
+    * String content > the content of the file
+    * File file > file in which the text will be saved
+    * */
+    private void saveTextToFile(String content, File file) {
+        try {
+            PrintWriter writer;
+            writer = new PrintWriter(file);
+            writer.println(content);
+            writer.close();
+        } catch (IOException ex) {
+            System.out.println(ex.toString());
         }
     }
 
