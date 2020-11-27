@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 public class Editor {
     private TextArea textArea = new TextArea();
+    File fileOpend;
     private Stage stage;
     public Editor(Stage stage){
         this.stage = stage;
@@ -19,41 +20,45 @@ public class Editor {
     public Scene mainScene(){
         FileChooser fileChooser = new FileChooser();
         VBox root = new VBox();
-
         //disable scroll in x axis
         textArea.setWrapText(true);
+        //set font size
+        textArea.setStyle("-fx-font-size: 1.5em;");
 
         //createting menu
         MenuBar menuBar = new MenuBar();
         Menu fileMenu = new Menu("File");
         MenuItem open = new MenuItem("Open File");
         MenuItem save = new MenuItem("Save");
+        Menu runCode = new Menu("Run");
+        MenuItem execute = new MenuItem("Execute Code");
         fileMenu.getItems().addAll(open, save);
-        menuBar.getMenus().addAll(fileMenu);
-        //MenuItem newFile = new MenuItem("New");
+        runCode.getItems().addAll(execute);
+        menuBar.getMenus().addAll(fileMenu, runCode);
 
         save.setOnAction(event -> {
             //Set extension filter for text files
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Kotlin Script (*.kts)", "*.kts");
             fileChooser.getExtensionFilters().add(extFilter);
 
             //Show save file dialog
-            File file = fileChooser.showSaveDialog(stage);
+            fileOpend = fileChooser.showSaveDialog(stage);
 
-            if (file != null) {
-                saveTextToFile(textArea.getText(), file);
+            if (fileOpend != null) {
+                saveTextToFile(textArea.getText(), fileOpend);
             }
+            stage.setTitle(fileOpend.getName());
         });
 
         open.setOnAction(event -> {
             //open File that user has choosen
-            File selectedFile = fileChooser.showOpenDialog(stage);
+            fileOpend = fileChooser.showOpenDialog(stage);
             //adding the content of the file to the textArea
             try {
-                String contents = new Scanner(selectedFile).useDelimiter("\\Z").next();
+                String contents = new Scanner(fileOpend).useDelimiter("\\Z").next();
                 textArea.clear();
                 textArea.setText(contents);
-                stage.setTitle(selectedFile.getName());
+                stage.setTitle(fileOpend.getName());
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
