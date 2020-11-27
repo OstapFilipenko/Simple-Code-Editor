@@ -1,3 +1,4 @@
+import Scenes.Editor;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -24,7 +25,8 @@ public class main extends Application {
         //adding elements to the root Pane
         root.getChildren().add(label);
 
-        Scene scene = new Scene(root, 500, 300);
+        Editor editor = new Editor();
+        Scene scene = editor.mainScene();
         primaryStage.setScene(scene);
         primaryStage.show();
     }
